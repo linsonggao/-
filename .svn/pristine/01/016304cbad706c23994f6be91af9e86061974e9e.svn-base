@@ -1,0 +1,41 @@
+
+<ul id="navigation">
+    <li class="manage"><a class="ajax-link" href="{:url('/admin')}"><i class="fa fa-home" aria-hidden="true"></i>
+		起始页</a>
+	</li>
+
+{foreach $menu as $key => $value}
+<li class="privs{$key}">
+    <a role="button" tabindex="0"><i class="fa {$value.icon}" aria-hidden="true"></i> <span>{$value.name}</span></a>
+    {if isset($value['children']) && $value['children']}
+    <ul>
+    	{foreach $value['children'] as $k => $v}
+        <li><a class="ajax-link" href="{:url($v['url'])}"><i class="fa fa-caret-right" aria-hidden="true"></i> {$v['name']}</a></li>
+        {/foreach}
+    </ul>
+    {/if}
+</li>
+{/foreach}
+<!-- 
+
+    <li class="privs1">
+        <a role="button" tabindex="0"><i class="fa fa-user-secret" aria-hidden="true"></i> <span>管理员管理</span></a>
+        <ul>
+            <li><a class="ajax-link" href="{:url('/admin/administrator')}"><i class="fa fa-caret-right" aria-hidden="true"></i> 管理员列表</a></li>
+            <li><a class="ajax-link" href="{:url('/admin/administrator/create')}"><i class="fa fa-caret-right"></i> 新增管理员</a></li>
+        </ul>
+    </li>
+
+
+
+    <li class="privs2">
+        <a role="button" tabindex="0"><i class="fa fa-cog" aria-hidden="true"></i> <span>设置</span></a>
+        <ul>
+            <li><a class="ajax-link" href="{:url('/admin/set')}"><i class="fa fa-caret-right" aria-hidden="true"></i> 权限管理</a></li>
+            <li><a class="ajax-link" href="{:url('/admin/set/rspwd')}"><i class="fa fa-caret-right"></i> 重置密码</a></li>
+        </ul>
+    </li>
+
+
+ -->
+</ul>

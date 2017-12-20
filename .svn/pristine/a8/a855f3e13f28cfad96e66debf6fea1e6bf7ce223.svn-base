@@ -1,0 +1,129 @@
+<?php
+// +----------------------------------------------------------------------
+// | redis 
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2017 
+// +----------------------------------------------------------------------
+// +----------------------------------------------------------------------
+// | Author: 村长 <8044023@qq.com>
+// +----------------------------------------------------------------------
+class RedisMsg extends Rediss{
+    public function __construct(){ parent::__construct(); }
+    protected $msg_type=array(//消息类型
+        "1v1","group","sysmsg"
+    );
+    /**
+     * 群组消息入列
+     * @param   键
+     *   */
+    public function pushGroupFlockMsg($arr){
+        $this->_redisRun->lPush($GLOBALS["config"]["REDIS_TABLE"]["msg_group_id"]["name"],json_encode($arr));
+    }
+    /**
+     * 组入列
+     * @param   消息id
+     * @param   用户id
+     *   */
+    public function groupPush($msg_group_id,$uid){
+         //入队列
+        $this->_redisRun->lPush("group_list",$msg_group_id.":".$uid);
+    }
+    
+    /**
+     * 消息加一         
+     * @param   $data   $uid,$msg_type,$id,$rows
+     * @param   $is_content 是否只更新消息
+     *   */
+    public function informIncr($data=array(),$is_content=false){//
+        $table_data=$GLOBALS["config"]["REDIS_TABLE"]["inform_"];
+        //验证 缓存中是否存在
+        $table  = $table_data["name"].$data["uid"];
+        $key    =$this->msg_type[$data["msg_type"]].":".$data["id"];
+        $val    =$data["number"];
+        $content=$data["add_time"].":".$data["content"];//
+        //存储 最新内容
+        $this->_redisRun->hSet($this->msg_type[$data["msg_type"]],$data["id"],$content);
+        $this->setCacheTime($this->msg_type[$data["msg_type"]], $table_data["cache_time"]);
+        //设置缓存时间
+        $this->setCacheTime($table, $table_data["cache_time"]);
+        if ($is_content)//是否只更新最新的一条消息
+            return;
+        if ($this->_redisRun->hExists($table,$key)){
+            $this->_redisRun->hIncrBy($table,$key,$val);
+            return;
+        }
+        //设置
+        $this->_redisRun->hSet($table,$key,$val);
+    }
+    /**
+     * 消息减一
+     * @param   $data   $uid,$msg_type,$id,$rows
+     *   */
+    public function informDec($data){
+        $table_data=$GLOBALS["config"]["REDIS_TABLE"]["inform_"];
+        //验证 缓存中是否存在
+        $table  = $table_data["name"].$data["uid"];
+        $key    =$this->msg_type[$data["msg_type"]].":".$data["id"];
+        $set_val=$data["number"];
+        $val    =$this->_redisRun->hGet($table,$key)-$set_val;
+       // if ($val<=0){//删除 该组元素
+            $this->_redisRun->hDel($this->msg_type[$data["msg_type"]],$data["id"]);
+            $this->_redisRun->hDel($table,$key);return;
+       // }
+        $this->_redisRun->hSet($table,$key,$val);
+    }
+    /**
+     * 获取消息列表
+     * @param   $uid
+     *   */
+    public function getInformList($uid){
+        $table_data=$GLOBALS["config"]["REDIS_TABLE"]["inform_"];
+        $list=$this->_redisRun->hGetAll($table_data["name"].$uid);
+        $arr=array();
+        $sum_number=0;
+        foreach ($list as $k=>$v){
+            list($msg_type,$msg_id)=explode(":",$k);
+            $info   =$this->splitaddtimeORcontent($this->_redisRun->hGet($msg_type,$msg_id));
+            if (in_array($msg_type,array("1v1"))){//单人和群组
+                $data=array(
+                    "to_uid"    =>$msg_id,
+                );
+            }else if(in_array($msg_type,array("group"))){//群组消息
+                $data=array(
+                    "group_id"    =>$msg_id,
+                );
+            }else if(in_array($msg_type,array("sysmsg"))){//后台系统推送
+                $data=array(
+                    "system_uid" =>$msg_id,
+                );
+            }
+            $arr["data"][$msg_type][]=array_merge($data,array(
+                "number"     =>$v,
+                "add_time"  =>$info["add_time"],
+                "content"   =>$info["content"]
+            ));
+            $sum_number=$sum_number+$v;
+        }
+        return array_merge($arr,array("sum_number"=>$sum_number));
+    }
+    /**
+     * 分离 时间和内容
+     * @param unknown $str  */
+    private function splitaddtimeORcontent($str,$symbol=":"){
+        $content="";
+        $time="";
+        foreach (explode($symbol,$str) as $k=>$v){
+            if ($k!=0){
+                $content.=$v;break;
+            }
+            $time=$v;
+        }
+        return array("content"=>$content,"add_time"=>$time);
+    }
+    /**
+     * 系统消息入列
+     *   */
+    public function pushMsgSystem($data){
+        $this->_redisRun->lPush($GLOBALS["config"]["REDIS_TABLE"]["msg_system"]["name"],json_encode($arr));
+    }
+}

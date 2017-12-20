@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<script src='/public/static/js/vendor/socket-io/socket.io.js'></script>
+<script src='/public/static/js/vendor/jquery/jquery-1.11.3.js'></script>
+</head>
+<body>
+<p id="content"> </p>
+<script>
+var uid = 1;
+$(document).ready(function () {
+    // 连接服务端
+    var socket = io('http://'+document.domain+':2120');
+    // 连接后登录
+    socket.on('connect', function(){
+    	socket.emit('login', uid);
+    });
+    // 后端推送来消息时
+    socket.on('new_msg', function(msg){
+    	var data=JSON.parse(msg);
+         $('#content').html('收到消息：'+msg);
+    });
+    // 后端推送来在线数据时
+    socket.on('update_online_count', function(online_stat){});
+});
+</script>
+</body>
+</html>

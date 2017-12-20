@@ -1,0 +1,42 @@
+<?php
+// +----------------------------------------------------------------------
+// | 发送短信
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2017 
+// | Data  2017年12月14日 下午6:06:44 
+// | Version  1.0.0
+// +----------------------------------------------------------------------
+// +----------------------------------------------------------------------
+// | Author: 村长 <8044023@qq.com> 
+// +----------------------------------------------------------------------
+class SendSms{
+    private $Container;
+    //初始化
+    public function __construct(){
+        $this->Container=new Container();
+    }
+    /**
+     * 发送短信
+     * @param unknown $phone    手机号
+     * @param unknown $code   验证码
+     * @param unknown $template_id  模板号
+     * */
+    public function send($phone,$code,$template_id){
+        $this->Container->sms2='sms2';
+        $Sms=$this->Container->sms2; 
+        return $Sms->send($phone,$this->getTemplate($template_id,$code),$template_id);
+    }
+    /**
+     * 获取模板
+     * @param unknown $template_id  */
+    private function getTemplate($template_id,$code=0) {
+        switch ($template_id){
+            case 1:
+                return "【闲白】验证码".$code."请勿向任何人泄漏您的验证码";
+                break;
+            case 2:
+                return "【闲白】验证码".$code."请勿向任何人泄漏您的验证码";
+                break;
+        }
+    }
+}

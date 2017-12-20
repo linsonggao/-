@@ -1,0 +1,89 @@
+<?php
+// +----------------------------------------------------------------------
+// | PHP后端端操作socket
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2017 
+// +----------------------------------------------------------------------
+// +----------------------------------------------------------------------
+// | Author: 村长 <8044023@qq.com>
+// +----------------------------------------------------------------------
+class SocketClinet{
+    const MSG_SYSTEM_CODE   =1;//推送系统消息
+    /**
+     * 推送消息给服务端
+     * @param   $data   需要推送的数据
+     * @param   $is_run 是否需要返回
+     *   */
+    public function pushServe($data,$type,$is_run=false){
+        $data=$this->runEffect($type, $data);
+        $client = stream_socket_client($GLOBALS["config"]["TCP_URL"], $errno, $errmsg, 1);
+        // 推送的数据，包含uid字段，表示是给这个uid推送
+        if ($GLOBALS["config"]["DEBUG"]==false){
+            $data=$this->_config["EXTEND"]["MCrypt"]->encrypt($data);
+        }
+        fwrite($client, json_encode($data).'\r\n');
+        if ($is_run==true){
+            return fread($client, 8192);
+        }
+    }
+    /**
+     * 服务端推送给后台
+     * @param unknown $system_uid
+     * @param unknown $content  */
+    public function pushSystemAdmin($data){
+        $this->curl_request($GLOBALS["config"]["PUSH_URL"],$data);  
+    }
+    /**
+     * 
+     * @param unknown $url
+     * @param unknown $data
+     * @param unknown $is_method  */
+    private function curl_request($url,$post='',$cookie='', $returnCookie=0){
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curl, CURLOPT_AUTOREFERER, 1);
+        curl_setopt($curl, CURLOPT_REFERER, "http://XXX");
+        if($post) {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($post));
+        }
+        if($cookie) {
+            curl_setopt($curl, CURLOPT_COOKIE, $cookie);
+        }
+        curl_setopt($curl, CURLOPT_HEADER, $returnCookie);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $data = curl_exec($curl);
+        if (curl_errno($curl)) {
+            return curl_error($curl);
+        }
+        curl_close($curl);
+        if($returnCookie){
+            list($header, $body) = explode("\r\n\r\n", $data, 2);
+            preg_match_all("/Set\-Cookie:([^;]*);/", $header, $matches);
+            $info['cookie']  = substr($matches[1][0], 1);
+            $info['content'] = $body;
+            return $info;
+        }else{
+            return $data;
+        }
+    }
+    /**
+     * 返回推送的类型
+     * @param unknown $type  */
+    private function runEffect($type,$data){
+        switch ($type){
+            case self::MSG_SYSTEM_CODE://推送系统消息
+                return array(
+                    "controller"=>"SystemPush",
+                    "method"    =>"sendToUserAll",
+                    "token"     =>date("Y-m-d"),
+                    "data"      =>$data
+                );
+                break;
+        }
+    }
+    
+}

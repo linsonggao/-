@@ -1,0 +1,71 @@
+<?php
+// +----------------------------------------------------------------------
+// | redis 底层操作
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2017 
+// +----------------------------------------------------------------------
+// +----------------------------------------------------------------------
+// | Author: 村长 <8044023@qq.com>
+// +----------------------------------------------------------------------
+class Rediss{
+    public $_redisRun;//实例化的redis
+    //初始化
+    public function __construct(){
+        $redis = new Redis();
+        $redis->connect(REDIS_HOST,REDIS_PROT);
+        $this->_redisRun=$redis; 
+    }
+    /**
+     * 获取 值
+     * @param unknown $key  键
+     * @return $string
+     *   */
+    public function strGet($key){
+        return $this->_redisRun->get($key);
+    }
+    /**
+     * 获取 值
+     * @param unknown $key 键
+     * @param unknown $val 值
+     * @param unknown $cache_time 缓存时间 
+     *  */
+    public function strSet($key,$val,$cache_time=0){
+        if ($cache_time==0){
+            return $this->_redisRun->set($key,$val);
+        }
+        return $this->_redisRun->setex($key,$cache_time,$val);
+    }
+    /**
+     * 获取 哈希值
+     * @param unknown $table  表
+     * @param unknown $val  值
+     * @return $string
+     *   */
+    public function hashGet($table,$key){
+        return $this->_redisRun->hget($table,$key);
+    }
+    /**
+     * 设置 哈希值
+     * @param unknown $table  表
+     * @param unknown $key  键
+     * @param unknown $val  值
+     * @param unknown $cache_time  缓存时间
+     * @return $string
+     *   */
+    public function hashSet($table,$key,$val,$cache_time=0){
+        if ($cache_time!=0){//缓存过期操作
+            $this->_redisRun->expire($table,$cache_time);
+        }
+        return $this->_redisRun->hset($table,$key,$val);
+    }
+    /**
+     * 设置缓存时间
+     * @param unknown $key  键
+     * @param unknown $time 缓存时间 秒 */
+    public function setCacheTime($key,$time){
+        if ($time!=0){
+            $this->_redisRun->expire($key,$time);
+        }
+    }
+    
+}

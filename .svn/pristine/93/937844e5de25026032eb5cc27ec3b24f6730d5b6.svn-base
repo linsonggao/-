@@ -1,0 +1,53 @@
+<?php
+// +----------------------------------------------------------------------
+// | 发送短信
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2017 
+// | Data  2017年12月14日 下午6:06:44 
+// | Version  1.0.0
+// +----------------------------------------------------------------------
+// +----------------------------------------------------------------------
+// | Author: 村长 <8044023@qq.com> 
+// +----------------------------------------------------------------------
+class sms2{
+    private $config=array(
+        "account"       =>2539039,//账号
+        "password"      =>"6101ric",//密码
+        "auth_password" =>"9427ea608eeded6b14808c9518799a0f",//授权码
+        "channel"       =>"253903901",//通道号
+        "url"           =>"http://sms.2office.cn:8080/WebService/SmsService.asmx?wsdl",//提交地址
+    );
+    /**
+     * 发送短信
+     * @param unknown $phone
+     * @param unknown $content  */
+    public function send($phone,$content,$template_id){
+        $client = new nusoap_client($this->config["url"],true);
+        //设置编码格式
+        $client->soap_defencoding = 'UTF-8';
+        $client->decode_utf8 = false;
+        $client->xml_encoding = 'UTF-8';
+        //此处的编码格式必须和网页的编码格式一致，如果网页的编码格式是GBK，则UTF-8必须修改为GBK，否则短信内容是乱码
+        $err = $client->getError();
+        if ($err) {
+            return array("code"=>501,"msg"=>$err);
+        }
+        $password = md5($this->config["password"].$this->config["auth_password"]);
+        $smsid = microtime(true)*100;
+        $param = array(
+            'account'=>$this->config["account"],
+            'password'=>$password,
+            'mobile'=>$phone,
+            'content'=>$content,
+            'channel'=>$this->config["channel"],
+            'smsid'=>$smsid,
+            'sendType'=>'1' 
+        );
+        $result = $client->call('SendSms3', array('parameters' => $param), '', '', false, true,'document','encoded');
+        list($code,$msg)=explode(",",$result['SendSms3Result']);
+        if ($code<0){
+            return array("code"=>501,"msg"=>$msg);
+        }
+        return array("code"=>200,"msg"=>$msg);
+    }
+}

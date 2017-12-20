@@ -1,0 +1,26 @@
+<?php
+// +----------------------------------------------------------------------
+// | 会员操作接口
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2017
+// +----------------------------------------------------------------------
+// +----------------------------------------------------------------------
+// | Author: 村长 <8044023@qq.com>
+// +----------------------------------------------------------------------
+namespace app\api\controller;
+class User extends Common{
+    //登录
+    public function login(){
+        $this->regInfoNull($this->info, array("phone","password"));
+        $result=model("User")->where(["phone"=>$this->info["phone"],"password"=>md5($this->info["password"])])->find();
+        if (!empty($result)){
+            return $this->apiJson($result,200,"ok");
+        }
+        return $this->apiJson('',301,"ok");
+    }
+    //获取好友列表
+    public function getFriendList(){
+        $this->regInfoNull($this->info, array("uid"));
+        return $this->apiJson(array("list"=>model("UserRelation")->getUserList($this->info["uid"])),200,"ok",false,true);
+    }
+}

@@ -1,0 +1,57 @@
+<?php
+// +----------------------------------------------------------------------
+// | api公共操作
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2017
+// +----------------------------------------------------------------------
+// +----------------------------------------------------------------------
+// | Author: 村长 <8044023@qq.com>
+// +----------------------------------------------------------------------
+namespace app\api\controller;
+class Publics extends Common{
+    /**
+     * app 启动接口
+     *   */
+    public function start(){
+        return $this->apiJson(array(
+            "debug"         =>(int)$GLOBALS["config"]["DEBUG"],//调试模式
+            "min_version"   =>$GLOBALS["config"]["MIN_VERSION"],//最低版本号  
+            "tcp_url"       =>$GLOBALS["config"]["TCP_URL"],
+            "resource_url"  =>$GLOBALS["config"]["RESOURCE_URL"],
+        ),200,"ok",true);
+    }
+    /**
+     * 文件上传接口
+     *   */
+    public function uploads(){
+        $file = request()->file('file');
+        // 移动到框架应用根目录/public/uploads/ 目录下
+        $dir=ROOT_PATH . 'public' . DS . 'uploads';
+        $info = $file->validate([
+            'size'=>1024000,//
+            'ext'=>array("jpg","gif","png")
+        ])->move($dir);
+        if($info){
+            // 成功上传后 获取上传信息
+            $path="public".DS."uploads".DS.$info->getSaveName();
+            $thumb_path="";
+            if (in_array($info->getExtension(),array("jpg","gif","png"))){//如果查询到 是图片类型 就缩约   
+                $image = \think\Image::open($path);
+                $thumb_path="public".DS."uploads".DS.date("Ymd").DS."thumb_".$info->getFilename();
+                $image->thumb(150, 150)->save($thumb_path);
+            }
+            //入库 数据库
+            model("CommonUploads")->data([
+                'suffix'        =>  $info->getExtension(),
+                'thumb_url'     =>  $thumb_path,
+                "url"           =>$path,
+                "create_date"   =>time()
+            ])->save();
+            //end
+            return $this->apiJson(array("path"=>$path,"thumb_path"=>$thumb_path ),200,"ok");
+        }else{
+            // 上传失败获取错误信息
+            return $this->apiJson('',415,$file->getError());
+        }
+    }
+}

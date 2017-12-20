@@ -1,0 +1,14 @@
+[2017-11-21 15:51:26.99417500][DEBUG]:worker_listen daemon pid:5128 Start
+[2017-11-21 15:51:27.07818000][DEBUG]:distribute_listen daemon pid:2700 Start
+[2017-11-21 15:51:37.08575200][DEBUG]:tasks\demo\demoTask [--START--]
+[2017-11-21 15:51:37.08575200][DEBUG]:Demolib run ok
+[2017-11-21 15:51:37.08575200][DEBUG]:demo任务运行成功
+[2017-11-21 15:51:37.08575200][DEBUG]:tasks\demo\demoTask [--END--][RunTime:0.000000s]
+[2017-11-21 15:51:37.08575200][DEBUG]:tasks\demo\demoTaskrun success
+[2017-11-21 15:51:47.29833600][DEBUG]:tasks\demo\demoTask [--START--]
+[2017-11-21 15:51:47.29833600][DEBUG]:Demolib run ok
+[2017-11-21 15:51:47.29833600][DEBUG]:demo任务运行成功
+[2017-11-21 15:51:47.29833600][DEBUG]:tasks\demo\demoTask [--END--][RunTime:0.000000s]
+[2017-11-21 15:51:47.29833600][DEBUG]:tasks\demo\demoTaskrun success
+[2017-11-21 15:52:36.58315500][DEBUG]:worker_listen daemon pid:6964 Start
+[2017-11-21 15:52:36.64915900][DEBUG]:distribute_listen daemon pid:6240 Start

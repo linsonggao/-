@@ -1,0 +1,26 @@
+<?php
+// +----------------------------------------------------------------------
+// | 公共模型
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2017
+// +----------------------------------------------------------------------
+// +----------------------------------------------------------------------
+// | Author: 村长 <8044023@qq.com>
+// +----------------------------------------------------------------------
+namespace app\api\model;
+use think\Db;
+class User extends CommonModel{
+    protected $resultSetType = 'collection';
+    public function demo(){  
+        //db('user')->where('uid',1)->update(['nickname' => 'thinkphp']);
+        /* Db::table('chat_user')
+        ->where('uid',1)
+        ->update(['nickname' => "concat(nickname)"]); */
+        
+        Db::query("update chat_user set nickname=CONCAT(nickname,'777') where uid=1");
+      //  Db::table('chat_user')->query();
+   //     dump($a);
+        $res=$this->where(array("uid"=>1))->find();
+    //    dump($res);
+    }
+}

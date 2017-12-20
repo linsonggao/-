@@ -1,0 +1,24 @@
+<?php
+// +----------------------------------------------------------------------
+// | 公共模型
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2017
+// +----------------------------------------------------------------------
+// +----------------------------------------------------------------------
+// | Author: 村长 <8044023@qq.com>
+// +----------------------------------------------------------------------
+namespace app\api\model;
+class UserRelation extends CommonModel{
+    //protected $readonly = ['user_relation_id','relation',"uid","to_uid"];
+    /**
+     * 获取好友列表
+     * @param unknown $uid  */
+    public function getUserList($uid){
+         $list=db("user_relation")->alias("a")
+            ->field("b.phone,a.user_relation_id,a.relation,a.to_uid,b.nickname")
+            ->join("chat_user b","a.to_uid=b.uid","left")
+            ->where(["a.uid"=>$uid,"a.relation"=>1,"a.status"=>1])
+            ->select();
+         return $list;
+    }
+}
