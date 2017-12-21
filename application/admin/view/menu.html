@@ -1,16 +1,16 @@
 
 <ul id="navigation">
-    <li class="manage"><a class="ajax-link" href="{:url('/admin')}"><i class="fa fa-home" aria-hidden="true"></i>
+    <li class="manage"><a class="ajax-link" href="{:url('/admin/welcome')}" target="iframecontent"><i class="fa fa-home" aria-hidden="true"></i>
 		起始页</a>
 	</li>
 
 {foreach $menu as $key => $value}
-<li class="privs{$key}">
+<li class="{$data.module_slug}">
     <a role="button" tabindex="0"><i class="fa {$value.icon}" aria-hidden="true"></i> <span>{$value.name}</span></a>
     {if isset($value['children']) && $value['children']}
     <ul>
     	{foreach $value['children'] as $k => $v}
-        <li><a class="ajax-link" href="{:url($v['url'])}"><i class="fa fa-caret-right" aria-hidden="true"></i> {$v['name']}</a></li>
+        <li><a class="ajax-link" href="{:url($v['url'])}" target="iframecontent"><i class="fa fa-caret-right" aria-hidden="true"></i> {$v['name']}</a></li>
         {/foreach}
     </ul>
     {/if}

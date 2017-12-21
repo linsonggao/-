@@ -5,7 +5,18 @@ use app\admin\controller\AdminAuth;
 use think\Validate;
 class Index extends AdminAuth
 {
+    //模块基本信息
+    private $data = array(
+        'module_slug' => 'admin',
+        );
     public function index()
+    {
+        $this->view->engine->layout('new_layout');
+        $this->data['admin_count'] = User::where('status','=',1)->count();
+        $this->assign('data',$this->data);
+        return $this->fetch();
+    }
+    public function welcome()
     {
         $this->data['admin_count'] = User::where('status','=',1)->count();
         $this->assign('data',$this->data);
