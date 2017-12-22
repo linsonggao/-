@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 use app\admin\model\User;
+use app\admin\model\Role;
 use app\admin\controller\AdminAuth;
 use think\Validate;
 use think\Image;
@@ -35,6 +36,7 @@ class Administrator extends AdminAuth
      */
     public function create()
     {
+        $role_select = $this->get_role_select();
     	$this->data['edit_fields'] = array(
 			'username' => array('type' => 'text', 'label'     => '用户名'),
 			'nickname' => array('type' => 'text', 'label'     => '用户昵称'),
@@ -43,6 +45,7 @@ class Administrator extends AdminAuth
 			'mobile'   => array('type' => 'text', 'label'     => '手机号'),
 			'avatar'   => array('type' => 'file','label'     => '头像'),
 			'status'   => array('type' => 'radio', 'label' => '状态','default'=> array(-1 => '删除', 0 => '禁用', 1 => '正常', 2 => '待审核')),
+            'role_id'  => array('type' => 'select', 'label' => '系统角色','default'=> $role_select),
         );
 
         //默认值设置
@@ -102,6 +105,7 @@ class Administrator extends AdminAuth
      */
     public function read($id='')
     {
+        $role_select = $this->get_role_select();
         $this->data['edit_fields'] = array(
 			'username' => array('type' => 'text', 'label'     => '用户名'),
 			'nickname' => array('type' => 'text', 'label'     => '用户昵称'),
@@ -110,6 +114,7 @@ class Administrator extends AdminAuth
 			'mobile'   => array('type' => 'text', 'label'     => '手机号'),
 			'avatar'   => array('type' => 'file','label'     => '头像'),
 			'status'   => array('type' => 'radio', 'label' => '状态','default'=> array(-1 => '删除', 0 => '禁用', 1 => '正常', 2 => '待审核')),
+            'role_id'  => array('type' => 'select', 'label' => '系统角色','default'=> $role_select),
         );
 
         //默认值设置
@@ -168,7 +173,7 @@ class Administrator extends AdminAuth
         }
 
         if ($user->update($data)) {
-            return $this->success('管理员信息更新成功',$this->data['module_url'].$id);
+            return $this->success('管理员信息更新成功',$this->data['module_url']);
         } else {
             return $user->getError();
         }
@@ -299,5 +304,13 @@ class Administrator extends AdminAuth
         	$data['msg'] = '更新失败';
         }
         return $data;
+    }
+    private function get_role_select(){
+        $roles = Role::where('is_delete',0)->where('id','gt',1)->select();
+        $role_select = [];
+        foreach ($roles as $key => $value) {
+            $role_select[$value['id']]=$value['name'];
+        }
+        return $role_select;
     }
 }

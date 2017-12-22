@@ -23,7 +23,7 @@ class Set extends AdminAuth
      */
     public function index()
     {
-        $list =  Role::where('is_delete','=','0')->paginate();
+        $list =  Role::where('is_delete','=','0')->where('id','gt',1)->paginate();
         $this->assign('data',$this->data);
         $this->assign('list',$list);
         return $this->fetch();
@@ -55,7 +55,7 @@ class Set extends AdminAuth
             $children = [];
             $default = [];
         	$default[$value['id']] = $value['name'];
-            $children = Privs::all(['pid'=>$value['id']]);
+            $children = Privs::all(['parent'=>$value['id']]);
             foreach ($children as $k => $v) {
                 $default['p'.$v['id']] = $v['name'];
                 $edit_fields['p'.$v['id']] = $v['name'];
@@ -113,7 +113,7 @@ class Set extends AdminAuth
         //dump(input('post.'));
         $data = input('post.');
         $rp = RolePrivs::destroy(['role_id'=>$id]);
-        if($rp){
+        if($rp || !RolePrivs::where('role_id',$id)->find()){
             $updateData = [];
             $rpModel = new RolePrivs;
             foreach ($data as $key => $parent_privs) {

@@ -84,6 +84,8 @@ class AdminAuth extends Controller {
 	//生成菜单
 	protected function menu(){
 		$privs = Privs::all(['pid'=>0]);
+		$menu = [];
+	    $myPrivs = RolePrivs::where(['role_id'=>session('role_id')])->select();
 		if(!($menu = session('menu'))){
 			$menu = [];
 	        $myPrivs = RolePrivs::where(['role_id'=>session('role_id')])->select();
@@ -123,7 +125,10 @@ class AdminAuth extends Controller {
 		  // dump(array_search($privsUrl,$urls));exit;
 		array_push($urls, '/admin/');
 		if(array_search($privsUrl,$urls) === false && $privsUrl!==''  && $privsUrl!=='/' && session('admin_username') !== 'admin'){
-			$this->error('没有访问该目录的权限'.$privsUrl,'/admin/login');
+			//$this->error('没有访问该目录的权限'.$privsUrl,'/admin/login');
+			echo '<script> alert("没有访问该目录的权限")</script>';
+			$this->error('没有权限','/admin/welcome');
+			exit;
 		}
 	}
 }
