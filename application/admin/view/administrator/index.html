@@ -11,7 +11,7 @@
 
                 <ul class="page-breadcrumb">
                     <li>
-                        <a href="{:url('/admin')}"><i class="fa fa-home"></i> 起始页</a>
+                        <a href="{:url('/admin/welcome')}"><i class="fa fa-home"></i> 起始页</a>
                     </li>
                     <li>
                         <a href="{:url($data.module_url)}">{$data.module_name}列表</a>
@@ -80,10 +80,10 @@
                                                         <i class="glyphicon glyphicon-edit icon-white"></i>
                                                         编辑
                                                     </a>
-                                                    <a class="btn btn-warning" href="javascript:;"  onclick="if(confirm('确定使管理员账号过期吗')){ updateExpireTime({$item->system_uid})}">
+                                                    <!-- <a class="btn btn-warning" href="javascript:;"  onclick="if(confirm('确定使管理员账号过期吗')){ updateExpireTime({$item->system_uid})}">
                                                         <i class="glyphicon glyphicon-time icon-white"></i>
                                                         使过期
-                                                    </a>
+                                                    </a> -->
                                                     <a class="btn btn-danger" href="javascript:;"  onclick="if(confirm('确定要删除该管理员账号吗')){ deleteData({$item->system_uid})}">
                                                         <i class="glyphicon glyphicon-trash icon-white"></i>
                                                         删除

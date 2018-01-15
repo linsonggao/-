@@ -82,7 +82,7 @@
                             <label>
                                 <input type="{$field['type']}" name="{$key}"
                                     {if isset($field['disabled']) AND $field['disabled']}disabled="disabled"{/if}
-                                    value="{$ov}" {if(isset($item[$key]) && $item[$key] == $ol)}
+                                    value="{$ov}" {if(isset($item[$key]) && $item[$key] == $ov)}
                                     checked="checked" {/if}> {$ol}
                             </label>
                         {/foreach}

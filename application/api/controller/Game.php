@@ -14,6 +14,7 @@ class Game extends Common{
      *   */
     public function getList(){
         $list=\think\Db::name("common_game")
+            ->field("common_game_id,name,picture,url")
             ->where(array("status"=>1))
             ->order("sort DESC")
             ->paginate($this->info["limit"],true);

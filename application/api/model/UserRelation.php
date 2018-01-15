@@ -15,10 +15,22 @@ class UserRelation extends CommonModel{
      * @param unknown $uid  */
     public function getUserList($uid){
          $list=db("user_relation")->alias("a")
-            ->field("b.phone,a.user_relation_id,a.relation,a.to_uid,b.nickname")
+            ->field("a.relation,b.phone,a.user_relation_id,a.to_uid,b.nickname,b.head_img,b.sex")
             ->join("chat_user b","a.to_uid=b.uid","left")
-            ->where(["a.uid"=>$uid,"a.relation"=>1,"a.status"=>1])
+            ->where(["a.uid"=>$uid,"a.status"=>1])
             ->select();
-         return $list;
+         $system_list=db("system_user")->field("nickname,system_uid,head_img")->where(array("is_show"=>1))->order("sort")->select();
+         return array("list"=>$list,"system_list"=>$system_list);
     }
+    /**
+     * 验证好友是否存在 自己的列表中
+     * @param unknown $uid
+     * @param unknown $to_uid  */
+    public function regUserExist($uid,$to_uid){
+        return (bool)db("user_relation")->where(array(
+            "uid"       =>$uid,
+            "to_uid"    =>$to_uid
+        ))->count();
+    }
+    
 }

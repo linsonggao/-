@@ -32,7 +32,7 @@ class Publics extends Common{
             // 移动到框架应用根目录/public/uploads/ 目录下
             $info = $file->validate([
                 'size'=>102400000,
-                'ext'=>array("jpg","gif","png"),
+                'ext'=>array("jpg","gif","png","wav"),
             ])->move($dir);
             if($info){
                 $path="public".DS."uploads".DS.$info->getSaveName();
@@ -75,13 +75,15 @@ class Publics extends Common{
             }
         }
         $code   =mt_rand(100000,999999);
-        \think\Db::name("common_sms_code")->where(array("phone"=>$phone))->update(array("status"=>-1));
-        \think\Db::name("common_sms_code")->insert(array(
-            "phone"         =>$phone,
-            "type"          =>$this->info["type"],
-            "code"          =>$code,
-            "create_date"   =>time()
-        ));
+        if (in_array($this->info["type"],array(1,2,3,4))){//发送验证码
+            \think\Db::name("common_sms_code")->where(array("phone"=>$phone))->update(array("status"=>-1));
+            \think\Db::name("common_sms_code")->insert(array(
+                "phone"         =>$phone,
+                "type"          =>$this->info["type"],
+                "code"          =>$code,
+                "create_date"   =>time()
+            ));
+        } 
         $sendSms=new \SendSms();
         $result=$sendSms->send($phone, $code, $this->info["type"]);
         return $this->apiJson(array("code"=>(string)$code),$result["code"],$result["msg"]);
@@ -98,5 +100,11 @@ class Publics extends Common{
             "create_date"   =>time()
         ));
         return $this->apiJson('',200,"ok");
+    }
+    //获取消息通知列表
+    public function getInformList(){
+        $this->regInfoNull($this->info, array("uid","inform_type"));
+        $list=model("CommonInform")->getList($this->info["uid"],$this->info["inform_type"]);
+        return $this->apiJson($list,200,"ok");
     }
 }

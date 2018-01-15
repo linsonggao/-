@@ -116,6 +116,12 @@ class Administrator extends AdminAuth
 			'status'   => array('type' => 'radio', 'label' => '状态','default'=> array(-1 => '删除', 0 => '禁用', 1 => '正常', 2 => '待审核')),
             'role_id'  => array('type' => 'select', 'label' => '系统角色','default'=> $role_select),
         );
+        if(request()->url() == '/admin/administrator/'.session('uid')){
+            unset($this->data['edit_fields']['role_id']);
+            //unset($this->data['edit_fields']['status']);
+            $this->data['edit_fields']['username']['disabled'] = 1;
+            $this->data['edit_fields']['status']['disabled'] = 1;
+        }
 
         //默认值设置
         $item = User::get($id);

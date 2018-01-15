@@ -48,7 +48,7 @@ class Set extends AdminAuth
         $this->assign('item',$privs_item);//1,2,3
         $this->assign('id',$id);
         $default = [];
-        $privs = Privs::all(['pid'=>0]);
+        $privs = Privs::where('pid',0)->order("sort DESC")->select();
         $edit_fields = [];
         foreach ($privs as $key => $value) {
             //$value['id']

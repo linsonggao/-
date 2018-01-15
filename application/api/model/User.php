@@ -13,12 +13,14 @@ class User extends CommonModel{
      * 用openid 查询用户信息
      * @param unknown $open_id  */
     public function getWxOne($open_id){
-        return db('user_third')->alias("a")
-                ->field("b.max_head_img,b.uid,b.username,b.phone,b.nickname,b.status,b.sex,b.head_img,b.email,c.identity,c.realname,b.is_inform")
+        $result =db('user_third')->alias("a")
+                ->field("b.login_number,b.max_head_img,b.uid,b.username,b.phone,b.nickname,b.status,b.sex,b.head_img,b.email,c.identity,c.realname,b.is_inform")
                 ->join("chat_user b","a.uid=b.uid","left")
                 ->join("chat_user_authentication c","c.uid=b.uid","left")
                 ->where(["a.open_id"=>$open_id,"a.type"=>1])
                 ->find();
+        $this->where(array("uid"=>$result["uid"]))->update(array("login_number"=>$result["login_number"]+1));
+        return $result;
     }
     /**
      * 验证 短信号码是否存在
@@ -41,15 +43,15 @@ class User extends CommonModel{
      * @param unknown $phone  */
     public function smsLogin($phone){
         $result=db("user")
-            ->field("a.max_head_img,a.uid,a.username,a.phone,a.nickname,a.status,a.sex,a.head_img,a.email,a.is_inform,b.identity,b.realname")
+            ->field("a.max_head_img,a.uid,a.username,a.phone,a.nickname,a.status,a.sex,a.head_img,a.email,a.is_inform,b.identity,b.realname,a.login_number")
             ->alias("a")
             ->join("chat_user_authentication b","a.uid=b.uid","left")
             ->where(array("a.phone"=>$phone,"a.status"=>array("in","-1,1")))
             ->find();
         if (empty($result)){
             return false;
-        }
-        $this->where(array("phone"=>$phone))->update(array("status"=>1));
+        }//登录次数加1
+        $this->where(array("phone"=>$phone))->update(array("status"=>1,"login_number"=>$result["login_number"]+1));
         return $result;
     }
     /**

@@ -30,14 +30,14 @@ class Common extends Controller{
      * @param unknown $data
      * @param number $code
      * @param string $msg  */
-    protected function apiJson($data,$code=200,$msg="ok",$is_encrypt=false,$is_cache=false){
+    protected function apiJson($data,$code=200,$msg="ok",$is_encrypt=false,$is_cache=true){
         $data_json=array(
             "data"  =>$data,
             "code"  =>$code,
             "msg"   =>$msg
         );
         //是否做缓存
-        if ($is_cache==true){
+        if ($is_cache==true && !empty($this->info["etage"])){
             $data_json["etage"]=md5(serialize($data));
             if ($data_json["etage"]==@$this->info["etage"]){
                 $data_json["data"]='';
@@ -45,6 +45,7 @@ class Common extends Controller{
             }
         }
         $data_json=$this->unsetnullArr($data_json);
+        (empty($data_json["data"])) && $data_json["data"]="";
         if ($GLOBALS["config"]["DEBUG"]==true || $is_encrypt==true){//开启调试模式
             return json($data_json,200);
         }

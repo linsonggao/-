@@ -7,6 +7,7 @@
  */
 namespace app\admin\controller;
 use app\admin\model\User;
+use app\admin\model\Group;
 use app\admin\model\Privs;
 use app\admin\model\RolePrivs;
 use think\Controller;
@@ -15,6 +16,11 @@ use think\Model;
 //权限认证
 class AdminAuth extends Controller {
 	protected function _initialize(){
+		$get = request()->get();
+		if(session('sendmsg')){
+			echo '<script>alert("'.session('sendmsg').'")</script>';
+			session('sendmsg',null);
+		}
 		$request = request();
 		//session存在时，不需要验证的权限
 		$not_check = array('admin/login','admin/login_action','admin/lostpassword','admin/logout','admin/lost_password');
@@ -28,7 +34,10 @@ class AdminAuth extends Controller {
 			$this->error('还没有登录，正在跳转到登录页','/admin/login');
 		}
 		$this->menu();
-		$this->checkPrivs();
+		//不是更新自己信息
+		if(request()->url() != '/admin/administrator/'.session('uid')){
+			$this->checkPrivs();
+		}
 		//密码校验
 		if(config('auth_password_check')){
 			$this->auth_password_check();
@@ -85,11 +94,17 @@ class AdminAuth extends Controller {
 	protected function menu(){
 		$privs = Privs::all(['pid'=>0]);
 		$menu = [];
-	    $myPrivs = RolePrivs::where(['role_id'=>session('role_id')])->select();
+	    $myPrivs = RolePrivs::where(['role_id'=>session('role_id')])->order("sort DESC")->select();
 		if(!($menu = session('menu'))){
 			$menu = [];
 	        $myPrivs = RolePrivs::where(['role_id'=>session('role_id')])->select();
 			foreach ($privs as $key => $value) {
+				if($value['id'] == 1){
+					$value['count'] = User::where('status','=',1)->count();
+				}
+				if($value['id'] == 15){
+					$value['count'] = Group::where('status','=',1)->count();
+				}
 				foreach ($myPrivs as $k => $privs) {
 
 	        		//dump($privs['privs_id']);exit;
@@ -99,6 +114,11 @@ class AdminAuth extends Controller {
 			            $menu[$key] = $value;
 			            $children = [];
 			            $children = Privs::all(['pid'=>$value['id']]);
+			            $count = count($children);
+			            $count = $count?$count:1;
+			            $radio = (1/$count) * 12;
+			            $css = 'col-xs-'.$radio;
+			            $menu[$key]['css'] = $css;
 			            $menu[$key]['children'] = $children;
 					}
 				}
@@ -123,6 +143,7 @@ class AdminAuth extends Controller {
 		  // dump($privsUrl);
 		  // dump($urls);
 		  // dump(array_search($privsUrl,$urls));exit;
+
 		array_push($urls, '/admin/');
 		if(array_search($privsUrl,$urls) === false && $privsUrl!==''  && $privsUrl!=='/' && session('admin_username') !== 'admin'){
 			//$this->error('没有访问该目录的权限'.$privsUrl,'/admin/login');

@@ -18,6 +18,7 @@ return [
         ':name' => ['index/hello', ['method' => 'post'], ['id' => '\d+']],
     ],
     // 路由规则定义
+    //url->folder/controller/function
     'admin/login/'                               => 'admin/index/login',
     'admin/login_action/'                        => 'admin/index/login_action',
     'admin/lost_password/'                       => 'admin/index/lost_password',
@@ -36,6 +37,20 @@ return [
     'admin/set/update_role_privs/:id'            => 'admin/set/update_role_privs',
     'admin/set/role_delete/:id'                  => 'admin/set/role_delete',
     'admin/set/:id'                              => 'admin/set/read',
-    'admin/welcome'                              => 'admin/index/welcome'
+    'admin/welcome'                              => 'admin/index/welcome',
+
+    'admin/player/update/:id'                    => 'admin/player/update',
+    'admin/player/log/:id'                       => 'admin/player/log',
+    'admin/player/amount_log/:id'                => 'admin/player/amount_log',
+    'admin/player/:id'                           => 'admin/player/read',
+
+    'admin/group/update/:id'                      => 'admin/group/update',
+    'admin/group/:id'                            => 'admin/group/read',
+
+    'admin/announcement/create'                 =>  'admin/announcement/create',
+
+    'admin/complain/update_complain'            =>  'admin/commoncomplain/update_complain',
+
+    'admin/test'                                 => 'admin/test/test',
 
 ];

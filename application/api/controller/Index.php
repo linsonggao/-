@@ -10,59 +10,23 @@
 namespace app\api\controller;
 class Index extends Common{
     public function index(){
-        $text="";
-        foreach (explode(":","123123:abc:333") as $k=>$v){
-            if ($k!=0){
-                $text.=$v;break;
-            }
-            $time=$v;
-        }
-        echo $time;
-        dump($text);
+       // action("extend/Push/announcement");
+        controller("extend/Push")->disposeComplain(2,5,"反馈内容",1);
+        //action
         die;
-        $uid=1;
-        $admin_list=\think\Db::name("system_user")->field("system_uid")->where(array("status"=>1))->select();
-        foreach ($admin_list as $v){//取全部管理员
-            //msg_system
-            $in="uid,".$v["system_uid"];
-            $where=array(
-                "uid"=>array("in",$in),
-                "to_uid"=>array("in",$in),
-            );
-            //取到 全部信息
-            $msg_count=\think\Db::name("msg_system")->where($where)->count();
-            //取当前会员 已读消息
-            $user_read_count=\think\Db::name("user_read_system")->where(array("uid"=>$uid))->count();
-            $total_count=$msg_count-$user_read_count;
-            if ($total_count>=0){//加入 
-                //取最后一条信息
-                $data=array(
-                    "uid"=>$uid,
-                    "msg_type"=>0,
-                    "id"=>$v["system_uid"],
-                    "number"=>$total_count,
-                    "content"=>"最后一条消息"
-                );
-                $GLOBALS["config"]["EXTEND"]["RedisMsg"]->informIncr($data);
-            }
-        }
-        die;
-        $a=new \SendSms();
-        $res=$a->send(18323456810,333,1);
-        dump($res);
-        die;
-        $system_uid=1;
-        $data=array(
-            "content"=>array(
-                "type"=>1,
-                "text"=>"内容"
-            ),
-            "to"    =>$system_uid
-        );//如果不传uid 是全局推送
-        $GLOBALS["config"]["EXTEND"]["SocketClinet"]->pushSystemAdmin($data);
-       // echo "index";
-     //   $GLOBALS["config"]["EXTEND"]["MCrypt"]->encrypt();
-        //return view("index",array("a"=>"b"));
+        return view("index");
+    }
+    public function pushInform(){ 
+        $data   =array(
+            "msg_id"        =>1,
+            "type"          =>"text",
+            "template_id"   =>1,
+            "scene_type"    =>3,
+            "title"         =>"通知标题",
+            "content"       =>"消息内容",
+            "create_date"   =>time()
+        );
+        $GLOBALS["config"]["EXTEND"]["SocketClinet"]->pushServe($data,1);
     }
     public function demo(){
         $SphinxClient=$GLOBALS["config"]["EXTEND"]["SphinxClient"];

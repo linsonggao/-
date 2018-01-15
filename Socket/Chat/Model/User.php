@@ -27,20 +27,27 @@ class User{
             $user_read_count=$GLOBALS["db"]->select("count(*) AS user_read_count")->from("chat_user_read_system")->where("uid=".$uid)->row()["user_read_count"];
             $total_count=$msg_count-$user_read_count;
             if ($total_count>=0){//加入
+                $data=array(
+                    "uid"=>$uid,
+                    "msg_type"=>2,
+                    "id"=>$v["system_uid"],
+                    "number"=>3,
+                );
+                $GLOBALS["config"]["EXTEND"]["RedisMsg"]->informDec($data);
                 //取最后一条信息
                 $chat_msg=$GLOBALS["db"]->select("chat_msg.content,chat_msg.create_date")
                     ->from("chat_msg_system")
-                    ->leftJoin("chat_msg","chat_msg_system.msg_id=chat_msg.msg_id")
+                    ->leftJoin("chat_msg","chat_msg.msg_id=chat_msg_system.msg_id")
                     ->where("chat_msg_system.system_uid in({$v["system_uid"]}) AND chat_msg_system.uid in({$uid},0)")
                     ->orderByDESC(array("chat_msg_system.msg_id"))
-                    ->row()["content"];
+                    ->row();
                 $data=array(
                     "uid"           =>$uid,
                     "msg_type"      =>2,
                     "id"            =>$v["system_uid"],
                     "number"        =>$total_count,
-                    "content"       =>$chat_msg["content"],
-                    "add_time"      =>$chat_msg["create_date"]
+                    "content"       =>@$chat_msg["content"],
+                    "add_time"      =>@$chat_msg["create_date"]
                 );
                 $GLOBALS["config"]["EXTEND"]["RedisMsg"]->informIncr($data);
             } 

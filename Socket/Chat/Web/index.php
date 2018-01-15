@@ -99,7 +99,7 @@
     function onSubmit() {
       
       //ws.send('{"type":"say","to_client_id":"'+to_client_id+'","to_client_name":"'+to_client_name+'","content":"'+input.value.replace(/"/g, '\\"').replace(/\n/g,'\\n').replace(/\r/g, '\\r')+'"}');
-	ws.send('{"controller":"SystemPush","method":"sendToUserAll","data":{"bodies":{"type":"system_text","content":"3","uid":1,"system_uid":1,"msg_type":1}},"token":"20171212"}\\r\\n');
+		ws.send('{"controller":"SystemPush","method":"sendToUserAll","data":{"bodies":{"type":"system_text","content":"3","uid":1,"system_uid":1,"msg_type":1}},"token":"20171212"}\\r\\n');
       
       return false;
     }

@@ -11,6 +11,9 @@ class Index extends AdminAuth
         );
     public function index()
     {
+        
+        $item = User::get(session('uid'));
+        $this->assign('avatar',$item['avatar']);
         $this->view->engine->layout('new_layout');
         $this->data['admin_count'] = User::where('status','=',1)->count();
         $this->assign('data',$this->data);

@@ -118,7 +118,13 @@ class Common{
     public function sendToUserGroup($result){
         Gateway::sendToGroup($GLOBALS["config"]["CHAT_GROUP"]["room_user"]["name"], $result);
     }
-    
+    /**
+     * 给某个会员推送消息
+     * @param unknown $uid
+     * @param unknown $result  */
+    public function sendToUid($uid,$result){
+        Gateway::sendToUid($uid,$result);
+    }
 }
 
 ?>

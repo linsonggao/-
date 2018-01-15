@@ -29,6 +29,7 @@ class User extends Common{
         if (empty($this->info["open_id"])){//手机注册
             return $this->apiJson($result,200,"ok");
         }
+        $this->oneLogin($result);
         //微信注册
         \think\Db::name("user_third")->insert(array(
             "uid"           =>$result["uid"],
@@ -37,6 +38,28 @@ class User extends Common{
             "create_date"=>time(),
         ));
         return $this->apiJson($result,200,"ok");
+    }
+    //处理第一次登录
+    public function oneLogin($info){
+        if ($info["login_number"]==0){
+            $msg_id=\think\Db::name("msg")->insert(array(
+                "type"          =>"text",
+                "dialogue_type" =>3,
+                "uid"           =>1,
+                "content"       =>"欢迎某某同学",
+                "create_date"   =>time(),
+            ));
+            \think\Db::name("msg_system")->insert(array(
+                "type"          =>2,
+                "system_uid"    =>1,
+                "msg_id"        =>$msg_id,
+                "msg_type"      =>1,
+                "uid"           =>$info["uid"],
+                "send_uid"      =>1,
+                "receive_uid"   =>$info["uid"],
+                "create_date"   =>time(),
+            ));
+        }
     }
     //退出
     public function checkOut(){
@@ -48,6 +71,7 @@ class User extends Common{
         $is_exist=model("User")->regSmsCode($this->info["phone"],$this->info["code"]);
         if ($is_exist){//
             $result=model("User")->smsLogin($this->info["phone"]);
+            $this->oneLogin($result);
             if (empty($result)){
                 return $this->apiJson($result,304,"用户不存在或者已经被管理员封禁");
             }
@@ -58,19 +82,20 @@ class User extends Common{
     //微信快捷登录
     public function wxLogin(){
         $this->regInfoNull($this->info, array("open_id"));
-        $result=model("User")->getWxOne($this->info["open_id"]);
+        $result=model("User")->getWxOne($this->info["open_id"]); 
         if ($result["status"]==-1){//账号已经被冻结
             return $this->apiJson('',302,"账号已经被冻结");
         }
         if (empty($result)){
             return $this->apiJson('',303,"绑定手机号");
         }
+        $this->oneLogin($result);
         return $this->apiJson($result,200,"ok");
     }
     //获取好友列表
     public function getFriendList(){
         $this->regInfoNull($this->info, array("uid"));
-        return $this->apiJson(array("list"=>model("UserRelation")->getUserList($this->info["uid"])),200,"ok",false,true);
+        return $this->apiJson(model("UserRelation")->getUserList($this->info["uid"]),200,"ok",false,true);
     }
     //修改昵称
     public function updateNickname(){
@@ -117,6 +142,12 @@ class User extends Common{
     public function updateInform(){
         $this->regInfoNull($this->info, array("uid","is_inform"));
         model("user")->where(array("uid"=>$this->info["uid"]))->update(array("is_inform"=>$this->info["is_inform"]));
+        return $this->apiJson('',200,"ok");
+    }
+    //冻结和解冻
+    public function safetyUser(){
+        $this->regInfoNull($this->info, array("phone","status"));
+        \think\Db::name("user")->where(array("phone"=>$this->info["phone"]))->update(array("status"=>$this->info["status"]));
         return $this->apiJson('',200,"ok");
     }
 }

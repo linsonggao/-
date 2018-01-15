@@ -13,7 +13,7 @@ class ReceiveMsg{
      * 修改聊天状态
      * @return  $msg_id
      *  */
-    public function updateMsgStatus($msg_1v1_id){
-        $GLOBALS["db"]->query("UPDATE `chat_msg_1v1` SET `msg_status` = 2 WHERE msg_1v1_id IN(".rtrim($msg_1v1_id,",").")");
+    public function updateMsgStatus($msg_id){
+       // $GLOBALS["db"]->query("UPDATE `chat_msg_1v1` SET `msg_status` = 2 WHERE msg_id IN(".rtrim($msg_id,",").")");
     }
 }

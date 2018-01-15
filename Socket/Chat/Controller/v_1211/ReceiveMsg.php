@@ -21,11 +21,11 @@ class ReceiveMsg extends Common{
             "uid"=>$info["to_uid"],
             "msg_type"=>0,
             "id"=>$info["uid"],
-            "number"=>substr_count($info["msg_1v1_id"],","),
+            "number"=>substr_count($info["msg_id"],","),
         );
         $GLOBALS["config"]["EXTEND"]["RedisMsg"]->informDec($data);
         //修改数据库状态
-        System::model("ReceiveMsg",false)->updateMsgStatus($info["msg_1v1_id"]);
+     //   System::model("ReceiveMsg",false)->updateMsgStatus($info["msg_id"]);
         //待写 修改数据状态
         $this->sendToClient($this->apiJson('', 200, "ok",false));
     }
@@ -38,7 +38,7 @@ class ReceiveMsg extends Common{
             "uid"=>$info["uid"],
             "msg_type"=>1,
             "id"=>$info["group_id"],
-            "number"=>substr_count($info["msg_group_id"],","),
+            "number"=>substr_count($info["msg_id"],","),
         );
         $GLOBALS["config"]["EXTEND"]["RedisMsg"]->informDec($data);
         $this->sendToClient($this->apiJson('', 200, "ok",false));
@@ -56,7 +56,19 @@ class ReceiveMsg extends Common{
         );
         $GLOBALS["config"]["EXTEND"]["RedisMsg"]->informDec($data);
         $this->sendToClient($this->apiJson('', 200, "ok",false));
-        /* $GLOBALS["config"]["EXTEND"]["RedisMsg"]->pushMsgSystem($info);
-        $this->sendToClient($this->apiJson('', 200, "ok",false)); */
+    }
+    /**
+     * 接受到 消息后返回
+     *   */
+    public function receviceInform(){
+        $info   =$this->data["data"];
+        $data=array(
+            "uid"=>$info["uid"],
+            "msg_type"=>3,
+            "id"=>$info["type"],
+            "number"=>1,
+        );
+        $GLOBALS["config"]["EXTEND"]["RedisMsg"]->informDec($data);
+        $this->sendToClient($this->apiJson('', 200, "ok",false));
     }
 }
